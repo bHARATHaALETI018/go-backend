@@ -19,7 +19,13 @@ migrateUp:
 migrateDown:
 	migrate -path db/migration -database "postgres://postgres:password@localhost:5432/opconnect?sslmode=disable" -verbose down
 
-downAll:
+sqlc:
+	sqlc generate
+
+upDb:
+	make createDb; make migrateUp
+
+downDb:
 	make migrateDown; make dropDb; make stopNdeletePostgresContainer
 
-.PHONY: postgres stopNdeletePostgresContainer createDb useDatabase dropDb migrateUp migrateDown
+.PHONY: postgres stopNdeletePostgresContainer createDb useDatabase dropDb migrateUp migrateDown sqlc upDb downDb

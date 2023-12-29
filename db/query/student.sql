@@ -4,16 +4,15 @@ INSERT INTO student(
     password,
     user_name,
     first_name,
-    middle_name,
     last_name,
     roll_number,
-    branch,
+    stream,
     section,
     course,
     phone,
     mentor
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 
 )
 RETURNING *;
 
@@ -26,35 +25,30 @@ WHERE roll_number = $1 LIMIT 1;
 SELECT * FROM student
 ORDER BY roll_number
 LIMIT $1
-OFFSET $2;
-
--- name: UpdateStudentMiddleName :one
-UPDATE student SET middle_name = $2
-WHERE roll_number = $1
-RETURNING *;
+OFFSET $2; 
 
 -- name: UpdateStudentMentor :one
-UPDATE student SET mentor = $2
+UPDATE student SET mentor = $2, updated_at = now()
 WHERE roll_number = $1
 RETURNING *;
 
 -- name: UpdateStudentCourse :one
-UPDATE student SET course = $2
+UPDATE student SET course = $2, updated_at = now()
 WHERE roll_number = $1
 RETURNING *;
 
--- name: UpdateStudentBranch :one
-UPDATE student SET branch = $2
+-- name: UpdateStudentStream :one
+UPDATE student SET stream = $2, updated_at = now()
 WHERE roll_number = $1
 RETURNING *;
 
 -- name: UpdateStudentSection :one
-UPDATE student SET section = $2
+UPDATE student SET section = $2, updated_at = now()
 WHERE roll_number = $1
 RETURNING *;
 
 -- name: UpdateStudentPhone :one
-UPDATE student SET phone = $2
+UPDATE student SET phone = $2, updated_at = now()
 WHERE id = $1
 RETURNING *;
 

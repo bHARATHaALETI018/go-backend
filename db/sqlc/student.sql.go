@@ -16,33 +16,31 @@ INSERT INTO student(
     password,
     user_name,
     first_name,
-    middle_name,
     last_name,
     roll_number,
-    branch,
+    stream,
     section,
     course,
     phone,
     mentor
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 
 )
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
 `
 
 type CreateStudentParams struct {
-	Email      string         `json:"email"`
-	Password   string         `json:"password"`
-	UserName   string         `json:"user_name"`
-	FirstName  string         `json:"first_name"`
-	MiddleName sql.NullString `json:"middle_name"`
-	LastName   string         `json:"last_name"`
-	RollNumber string         `json:"roll_number"`
-	Branch     string         `json:"branch"`
-	Section    string         `json:"section"`
-	Course     string         `json:"course"`
-	Phone      string         `json:"phone"`
-	Mentor     sql.NullInt64  `json:"mentor"`
+	Email      string        `json:"email"`
+	Password   string        `json:"password"`
+	UserName   string        `json:"user_name"`
+	FirstName  string        `json:"first_name"`
+	LastName   string        `json:"last_name"`
+	RollNumber string        `json:"roll_number"`
+	Stream     string        `json:"stream"`
+	Section    string        `json:"section"`
+	Course     string        `json:"course"`
+	Phone      string        `json:"phone"`
+	Mentor     sql.NullInt64 `json:"mentor"`
 }
 
 func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (Student, error) {
@@ -51,10 +49,9 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 		arg.Password,
 		arg.UserName,
 		arg.FirstName,
-		arg.MiddleName,
 		arg.LastName,
 		arg.RollNumber,
-		arg.Branch,
+		arg.Stream,
 		arg.Section,
 		arg.Course,
 		arg.Phone,
@@ -67,10 +64,9 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,
@@ -83,7 +79,7 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 
 const deleteStudent = `-- name: DeleteStudent :one
 DELETE FROM student WHERE roll_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
 `
 
 func (q *Queries) DeleteStudent(ctx context.Context, rollNumber string) (Student, error) {
@@ -95,10 +91,9 @@ func (q *Queries) DeleteStudent(ctx context.Context, rollNumber string) (Student
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,
@@ -110,7 +105,7 @@ func (q *Queries) DeleteStudent(ctx context.Context, rollNumber string) (Student
 }
 
 const getStudent = `-- name: GetStudent :one
-SELECT id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at FROM student
+SELECT id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at FROM student
 WHERE roll_number = $1 LIMIT 1
 `
 
@@ -123,10 +118,9 @@ func (q *Queries) GetStudent(ctx context.Context, rollNumber string) (Student, e
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,
@@ -138,7 +132,7 @@ func (q *Queries) GetStudent(ctx context.Context, rollNumber string) (Student, e
 }
 
 const listStudents = `-- name: ListStudents :many
-SELECT id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at FROM student
+SELECT id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at FROM student
 ORDER BY roll_number
 LIMIT $1
 OFFSET $2
@@ -164,10 +158,9 @@ func (q *Queries) ListStudents(ctx context.Context, arg ListStudentsParams) ([]S
 			&i.Password,
 			&i.UserName,
 			&i.FirstName,
-			&i.MiddleName,
 			&i.LastName,
 			&i.RollNumber,
-			&i.Branch,
+			&i.Stream,
 			&i.Section,
 			&i.Course,
 			&i.Phone,
@@ -188,44 +181,10 @@ func (q *Queries) ListStudents(ctx context.Context, arg ListStudentsParams) ([]S
 	return items, nil
 }
 
-const updateStudentBranch = `-- name: UpdateStudentBranch :one
-UPDATE student SET branch = $2
-WHERE roll_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
-`
-
-type UpdateStudentBranchParams struct {
-	RollNumber string `json:"roll_number"`
-	Branch     string `json:"branch"`
-}
-
-func (q *Queries) UpdateStudentBranch(ctx context.Context, arg UpdateStudentBranchParams) (Student, error) {
-	row := q.db.QueryRowContext(ctx, updateStudentBranch, arg.RollNumber, arg.Branch)
-	var i Student
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Password,
-		&i.UserName,
-		&i.FirstName,
-		&i.MiddleName,
-		&i.LastName,
-		&i.RollNumber,
-		&i.Branch,
-		&i.Section,
-		&i.Course,
-		&i.Phone,
-		&i.Mentor,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const updateStudentCourse = `-- name: UpdateStudentCourse :one
-UPDATE student SET course = $2
+UPDATE student SET course = $2, updated_at = now()
 WHERE roll_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
 `
 
 type UpdateStudentCourseParams struct {
@@ -242,10 +201,9 @@ func (q *Queries) UpdateStudentCourse(ctx context.Context, arg UpdateStudentCour
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,
@@ -257,9 +215,9 @@ func (q *Queries) UpdateStudentCourse(ctx context.Context, arg UpdateStudentCour
 }
 
 const updateStudentMentor = `-- name: UpdateStudentMentor :one
-UPDATE student SET mentor = $2
+UPDATE student SET mentor = $2, updated_at = now()
 WHERE roll_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
 `
 
 type UpdateStudentMentorParams struct {
@@ -276,44 +234,9 @@ func (q *Queries) UpdateStudentMentor(ctx context.Context, arg UpdateStudentMent
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
-		&i.Section,
-		&i.Course,
-		&i.Phone,
-		&i.Mentor,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const updateStudentMiddleName = `-- name: UpdateStudentMiddleName :one
-UPDATE student SET middle_name = $2
-WHERE roll_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
-`
-
-type UpdateStudentMiddleNameParams struct {
-	RollNumber string         `json:"roll_number"`
-	MiddleName sql.NullString `json:"middle_name"`
-}
-
-func (q *Queries) UpdateStudentMiddleName(ctx context.Context, arg UpdateStudentMiddleNameParams) (Student, error) {
-	row := q.db.QueryRowContext(ctx, updateStudentMiddleName, arg.RollNumber, arg.MiddleName)
-	var i Student
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Password,
-		&i.UserName,
-		&i.FirstName,
-		&i.MiddleName,
-		&i.LastName,
-		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,
@@ -325,9 +248,9 @@ func (q *Queries) UpdateStudentMiddleName(ctx context.Context, arg UpdateStudent
 }
 
 const updateStudentPhone = `-- name: UpdateStudentPhone :one
-UPDATE student SET phone = $2
+UPDATE student SET phone = $2, updated_at = now()
 WHERE id = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
 `
 
 type UpdateStudentPhoneParams struct {
@@ -344,10 +267,9 @@ func (q *Queries) UpdateStudentPhone(ctx context.Context, arg UpdateStudentPhone
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,
@@ -359,9 +281,9 @@ func (q *Queries) UpdateStudentPhone(ctx context.Context, arg UpdateStudentPhone
 }
 
 const updateStudentSection = `-- name: UpdateStudentSection :one
-UPDATE student SET section = $2
+UPDATE student SET section = $2, updated_at = now()
 WHERE roll_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, roll_number, branch, section, course, phone, mentor, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
 `
 
 type UpdateStudentSectionParams struct {
@@ -378,10 +300,42 @@ func (q *Queries) UpdateStudentSection(ctx context.Context, arg UpdateStudentSec
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.RollNumber,
-		&i.Branch,
+		&i.Stream,
+		&i.Section,
+		&i.Course,
+		&i.Phone,
+		&i.Mentor,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateStudentStream = `-- name: UpdateStudentStream :one
+UPDATE student SET stream = $2, updated_at = now()
+WHERE roll_number = $1
+RETURNING id, email, password, user_name, first_name, last_name, roll_number, stream, section, course, phone, mentor, created_at, updated_at
+`
+
+type UpdateStudentStreamParams struct {
+	RollNumber string `json:"roll_number"`
+	Stream     string `json:"stream"`
+}
+
+func (q *Queries) UpdateStudentStream(ctx context.Context, arg UpdateStudentStreamParams) (Student, error) {
+	row := q.db.QueryRowContext(ctx, updateStudentStream, arg.RollNumber, arg.Stream)
+	var i Student
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.UserName,
+		&i.FirstName,
+		&i.LastName,
+		&i.RollNumber,
+		&i.Stream,
 		&i.Section,
 		&i.Course,
 		&i.Phone,

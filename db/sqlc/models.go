@@ -59,9 +59,7 @@ type Admin struct {
 	Password  string `json:"password"`
 	UserName  string `json:"user_name"`
 	FirstName string `json:"first_name"`
-	// can be given or left unfilled
-	MiddleName sql.NullString `json:"middle_name"`
-	LastName   string         `json:"last_name"`
+	LastName  string `json:"last_name"`
 	// teacher id number from the id card
 	IDNumber  string       `json:"id_number"`
 	Phone     string       `json:"phone"`
@@ -75,10 +73,8 @@ type Mentor struct {
 	Password  string `json:"password"`
 	UserName  string `json:"user_name"`
 	FirstName string `json:"first_name"`
-	// can be given or left unfilled
-	MiddleName sql.NullString `json:"middle_name"`
-	LastName   string         `json:"last_name"`
-	Phone      string         `json:"phone"`
+	LastName  string `json:"last_name"`
+	Phone     string `json:"phone"`
 	// teacher id number from the id card
 	IDNumber  string       `json:"id_number"`
 	CreatedAt sql.NullTime `json:"created_at"`
@@ -106,20 +102,18 @@ type OpportunityStatusHistory struct {
 }
 
 type Student struct {
-	ID        int64  `json:"id"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	UserName  string `json:"user_name"`
-	FirstName string `json:"first_name"`
-	// can be given or left unfilled
-	MiddleName sql.NullString `json:"middle_name"`
-	LastName   string         `json:"last_name"`
-	RollNumber string         `json:"roll_number"`
-	Branch     string         `json:"branch"`
-	Section    string         `json:"section"`
-	Course     string         `json:"course"`
-	Phone      string         `json:"phone"`
-	Mentor     sql.NullInt64  `json:"mentor"`
-	CreatedAt  sql.NullTime   `json:"created_at"`
-	UpdatedAt  sql.NullTime   `json:"updated_at"`
+	ID         int64         `json:"id"`
+	Email      string        `json:"email"`
+	Password   string        `json:"password"`
+	UserName   string        `json:"user_name"`
+	FirstName  string        `json:"first_name"`
+	LastName   string        `json:"last_name"`
+	RollNumber string        `json:"roll_number"`
+	Stream     string        `json:"stream"`
+	Section    string        `json:"section"`
+	Course     string        `json:"course"`
+	Phone      string        `json:"phone"`
+	Mentor     sql.NullInt64 `json:"mentor"`
+	CreatedAt  sql.NullTime  `json:"created_at"`
+	UpdatedAt  sql.NullTime  `json:"updated_at"`
 }

@@ -10,7 +10,6 @@ CREATE TABLE "admin" (
   "password" varchar NOT NULL,
   "user_name" varchar UNIQUE NOT NULL,
   "first_name" varchar NOT NULL,
-  "middle_name" varchar DEFAULT null,
   "last_name" varchar NOT NULL,
   "id_number" varchar UNIQUE NOT NULL,
   "phone" varchar(10) UNIQUE NOT NULL,
@@ -24,7 +23,6 @@ CREATE TABLE "mentor" (
   "password" varchar NOT NULL,
   "user_name" varchar UNIQUE NOT NULL,
   "first_name" varchar NOT NULL,
-  "middle_name" varchar DEFAULT null,
   "last_name" varchar NOT NULL,
   "phone" varchar(10) UNIQUE NOT NULL,
   "id_number" varchar UNIQUE NOT NULL,
@@ -38,14 +36,13 @@ CREATE TABLE "student" (
   "password" varchar NOT NULL,
   "user_name" varchar UNIQUE NOT NULL,
   "first_name" varchar NOT NULL,
-  "middle_name" varchar DEFAULT null,
   "last_name" varchar NOT NULL,
   "roll_number" varchar UNIQUE NOT NULL,
-  "branch" varchar NOT NULL,
+  "stream" varchar NOT NULL,
   "section" varchar(1) NOT NULL,
   "course" varchar NOT NULL,
   "phone" varchar(10) UNIQUE NOT NULL,
-  "mentor" bigserial UNIQUE,
+  "mentor" bigint UNIQUE,
   "created_at" timestamptz DEFAULT (now()),
   "updated_at" timestamptz
 );
@@ -55,15 +52,15 @@ CREATE TABLE "opportunity" (
   "title" varchar NOT NULL,
   "link" varchar UNIQUE NOT NULL,
   "status" statuses DEFAULT 'waiting for approval',
-  "created_by" bigserial NOT NULL,
-  "approved_by" bigserial,
+  "created_by" bigint NOT NULL,
+  "approved_by" bigint,
   "created_at" timestamptz DEFAULT (now()),
   "updated_at" timestamptz
 );
 
 CREATE TABLE "opportunity_status_history" (
   "id" bigserial PRIMARY KEY,
-  "opportunity_id" bigserial,
+  "opportunity_id" bigint,
   "previous_status" statuses NOT NULL,
   "status" statuses NOT NULL,
   "created_at" timestamptz DEFAULT (now()),
@@ -98,15 +95,11 @@ CREATE INDEX ON "opportunity" ("approved_by");
 
 CREATE INDEX ON "opportunity_status_history" ("status");
 
-COMMENT ON COLUMN "admin"."middle_name" IS 'can be given or left unfilled';
 
 COMMENT ON COLUMN "admin"."id_number" IS 'teacher id number from the id card';
 
-COMMENT ON COLUMN "mentor"."middle_name" IS 'can be given or left unfilled';
-
 COMMENT ON COLUMN "mentor"."id_number" IS 'teacher id number from the id card';
 
-COMMENT ON COLUMN "student"."middle_name" IS 'can be given or left unfilled';
 
 ALTER TABLE "student" ADD FOREIGN KEY ("mentor") REFERENCES "mentor" ("id");
 

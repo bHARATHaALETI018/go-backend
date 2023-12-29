@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createAdmin = `-- name: CreateAdmin :one
@@ -15,26 +14,24 @@ INSERT INTO admin (
   email,
   password,
   user_name,
-  first_name,
-  middle_name,
+  first_name,  
   last_name,
   id_number,
   phone
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
+  $1, $2, $3, $4, $5, $6, $7 
 )
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, id_number, phone, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, id_number, phone, created_at, updated_at
 `
 
 type CreateAdminParams struct {
-	Email      string         `json:"email"`
-	Password   string         `json:"password"`
-	UserName   string         `json:"user_name"`
-	FirstName  string         `json:"first_name"`
-	MiddleName sql.NullString `json:"middle_name"`
-	LastName   string         `json:"last_name"`
-	IDNumber   string         `json:"id_number"`
-	Phone      string         `json:"phone"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	UserName  string `json:"user_name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	IDNumber  string `json:"id_number"`
+	Phone     string `json:"phone"`
 }
 
 func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) (Admin, error) {
@@ -43,7 +40,6 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) (Admin
 		arg.Password,
 		arg.UserName,
 		arg.FirstName,
-		arg.MiddleName,
 		arg.LastName,
 		arg.IDNumber,
 		arg.Phone,
@@ -55,7 +51,6 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) (Admin
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.IDNumber,
 		&i.Phone,
@@ -67,7 +62,7 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) (Admin
 
 const deleteAdmin = `-- name: DeleteAdmin :one
 DELETE FROM admin WHERE id_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, id_number, phone, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, id_number, phone, created_at, updated_at
 `
 
 func (q *Queries) DeleteAdmin(ctx context.Context, idNumber string) (Admin, error) {
@@ -79,7 +74,6 @@ func (q *Queries) DeleteAdmin(ctx context.Context, idNumber string) (Admin, erro
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.IDNumber,
 		&i.Phone,
@@ -90,7 +84,7 @@ func (q *Queries) DeleteAdmin(ctx context.Context, idNumber string) (Admin, erro
 }
 
 const getAdmin = `-- name: GetAdmin :one
-SELECT id, email, password, user_name, first_name, middle_name, last_name, id_number, phone, created_at, updated_at FROM admin
+SELECT id, email, password, user_name, first_name, last_name, id_number, phone, created_at, updated_at FROM admin
 WHERE id_number = $1 LIMIT 1
 `
 
@@ -103,7 +97,6 @@ func (q *Queries) GetAdmin(ctx context.Context, idNumber string) (Admin, error) 
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.IDNumber,
 		&i.Phone,
@@ -114,7 +107,7 @@ func (q *Queries) GetAdmin(ctx context.Context, idNumber string) (Admin, error) 
 }
 
 const listAdmins = `-- name: ListAdmins :many
-SELECT id, email, password, user_name, first_name, middle_name, last_name, id_number, phone, created_at, updated_at FROM admin
+SELECT id, email, password, user_name, first_name, last_name, id_number, phone, created_at, updated_at FROM admin
 ORDER BY id_number
 LIMIT $1
 OFFSET $2
@@ -140,7 +133,6 @@ func (q *Queries) ListAdmins(ctx context.Context, arg ListAdminsParams) ([]Admin
 			&i.Password,
 			&i.UserName,
 			&i.FirstName,
-			&i.MiddleName,
 			&i.LastName,
 			&i.IDNumber,
 			&i.Phone,
@@ -160,40 +152,10 @@ func (q *Queries) ListAdmins(ctx context.Context, arg ListAdminsParams) ([]Admin
 	return items, nil
 }
 
-const updateAdminMiddleName = `-- name: UpdateAdminMiddleName :one
-UPDATE admin SET middle_name = $2
-WHERE id_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, id_number, phone, created_at, updated_at
-`
-
-type UpdateAdminMiddleNameParams struct {
-	IDNumber   string         `json:"id_number"`
-	MiddleName sql.NullString `json:"middle_name"`
-}
-
-func (q *Queries) UpdateAdminMiddleName(ctx context.Context, arg UpdateAdminMiddleNameParams) (Admin, error) {
-	row := q.db.QueryRowContext(ctx, updateAdminMiddleName, arg.IDNumber, arg.MiddleName)
-	var i Admin
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Password,
-		&i.UserName,
-		&i.FirstName,
-		&i.MiddleName,
-		&i.LastName,
-		&i.IDNumber,
-		&i.Phone,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const updateAdminPhone = `-- name: UpdateAdminPhone :one
-UPDATE admin SET phone = $2
+UPDATE admin SET phone = $2, updated_at = now()
 WHERE id_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, id_number, phone, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, id_number, phone, created_at, updated_at
 `
 
 type UpdateAdminPhoneParams struct {
@@ -210,7 +172,6 @@ func (q *Queries) UpdateAdminPhone(ctx context.Context, arg UpdateAdminPhonePara
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.IDNumber,
 		&i.Phone,

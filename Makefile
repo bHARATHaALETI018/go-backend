@@ -28,4 +28,7 @@ upDb:
 downDb:
 	make migrateDown; make dropDb; make stopNdeletePostgresContainer
 
+test:
+	go test -v -cover ./...
+
 .PHONY: postgres stopNdeletePostgresContainer createDb useDatabase dropDb migrateUp migrateDown sqlc upDb downDb

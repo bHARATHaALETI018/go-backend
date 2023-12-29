@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createMentor = `-- name: CreateMentor :one
@@ -15,26 +14,24 @@ INSERT INTO mentor(
     email,
     password,
     user_name,
-    first_name,
-    middle_name,
+    first_name,  
     last_name,
     phone,
     id_number
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7 
 )
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, phone, id_number, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, phone, id_number, created_at, updated_at
 `
 
 type CreateMentorParams struct {
-	Email      string         `json:"email"`
-	Password   string         `json:"password"`
-	UserName   string         `json:"user_name"`
-	FirstName  string         `json:"first_name"`
-	MiddleName sql.NullString `json:"middle_name"`
-	LastName   string         `json:"last_name"`
-	Phone      string         `json:"phone"`
-	IDNumber   string         `json:"id_number"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	UserName  string `json:"user_name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Phone     string `json:"phone"`
+	IDNumber  string `json:"id_number"`
 }
 
 func (q *Queries) CreateMentor(ctx context.Context, arg CreateMentorParams) (Mentor, error) {
@@ -43,7 +40,6 @@ func (q *Queries) CreateMentor(ctx context.Context, arg CreateMentorParams) (Men
 		arg.Password,
 		arg.UserName,
 		arg.FirstName,
-		arg.MiddleName,
 		arg.LastName,
 		arg.Phone,
 		arg.IDNumber,
@@ -55,7 +51,6 @@ func (q *Queries) CreateMentor(ctx context.Context, arg CreateMentorParams) (Men
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.Phone,
 		&i.IDNumber,
@@ -67,7 +62,7 @@ func (q *Queries) CreateMentor(ctx context.Context, arg CreateMentorParams) (Men
 
 const deleteMentor = `-- name: DeleteMentor :one
 DELETE FROM mentor WHERE id_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, phone, id_number, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, phone, id_number, created_at, updated_at
 `
 
 func (q *Queries) DeleteMentor(ctx context.Context, idNumber string) (Mentor, error) {
@@ -79,7 +74,6 @@ func (q *Queries) DeleteMentor(ctx context.Context, idNumber string) (Mentor, er
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.Phone,
 		&i.IDNumber,
@@ -90,7 +84,7 @@ func (q *Queries) DeleteMentor(ctx context.Context, idNumber string) (Mentor, er
 }
 
 const getMentor = `-- name: GetMentor :one
-SELECT id, email, password, user_name, first_name, middle_name, last_name, phone, id_number, created_at, updated_at FROM mentor
+SELECT id, email, password, user_name, first_name, last_name, phone, id_number, created_at, updated_at FROM mentor
 WHERE id_number = $1 LIMIT 1
 `
 
@@ -103,7 +97,6 @@ func (q *Queries) GetMentor(ctx context.Context, idNumber string) (Mentor, error
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.Phone,
 		&i.IDNumber,
@@ -114,7 +107,7 @@ func (q *Queries) GetMentor(ctx context.Context, idNumber string) (Mentor, error
 }
 
 const listMentors = `-- name: ListMentors :many
-SELECT id, email, password, user_name, first_name, middle_name, last_name, phone, id_number, created_at, updated_at FROM mentor
+SELECT id, email, password, user_name, first_name, last_name, phone, id_number, created_at, updated_at FROM mentor
 ORDER BY id_number
 LIMIT $1
 OFFSET $2
@@ -140,7 +133,6 @@ func (q *Queries) ListMentors(ctx context.Context, arg ListMentorsParams) ([]Men
 			&i.Password,
 			&i.UserName,
 			&i.FirstName,
-			&i.MiddleName,
 			&i.LastName,
 			&i.Phone,
 			&i.IDNumber,
@@ -160,40 +152,10 @@ func (q *Queries) ListMentors(ctx context.Context, arg ListMentorsParams) ([]Men
 	return items, nil
 }
 
-const updateMentorMiddleName = `-- name: UpdateMentorMiddleName :one
-UPDATE mentor SET middle_name = $2
-WHERE id_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, phone, id_number, created_at, updated_at
-`
-
-type UpdateMentorMiddleNameParams struct {
-	IDNumber   string         `json:"id_number"`
-	MiddleName sql.NullString `json:"middle_name"`
-}
-
-func (q *Queries) UpdateMentorMiddleName(ctx context.Context, arg UpdateMentorMiddleNameParams) (Mentor, error) {
-	row := q.db.QueryRowContext(ctx, updateMentorMiddleName, arg.IDNumber, arg.MiddleName)
-	var i Mentor
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Password,
-		&i.UserName,
-		&i.FirstName,
-		&i.MiddleName,
-		&i.LastName,
-		&i.Phone,
-		&i.IDNumber,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const updateMentorPhone = `-- name: UpdateMentorPhone :one
-UPDATE mentor SET phone = $2
+UPDATE mentor SET phone = $2, updated_at = now()
 WHERE id_number = $1
-RETURNING id, email, password, user_name, first_name, middle_name, last_name, phone, id_number, created_at, updated_at
+RETURNING id, email, password, user_name, first_name, last_name, phone, id_number, created_at, updated_at
 `
 
 type UpdateMentorPhoneParams struct {
@@ -210,7 +172,6 @@ func (q *Queries) UpdateMentorPhone(ctx context.Context, arg UpdateMentorPhonePa
 		&i.Password,
 		&i.UserName,
 		&i.FirstName,
-		&i.MiddleName,
 		&i.LastName,
 		&i.Phone,
 		&i.IDNumber,

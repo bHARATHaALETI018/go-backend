@@ -77,28 +77,31 @@ func TestGetStudent(t *testing.T){
 	require.WithinDuration(t, student1.CreatedAt.Time, student2.CreatedAt.Time, time.Second)
 }
 
-// func TestUpdateAdminPhone(t *testing.T){
-// 	admin1 := createRandomStudent(t)
-// 	arg := UpdateAdminPhoneParams{
-// 		IDNumber: admin1.IDNumber,
-// 		Phone: util.RandomPhone(),
-// 	}
-// 	admin2, err := testQueries.UpdateAdminPhone(context.Background(), arg)
-// 	if(err!=nil){
-// 		log.Fatal("Failed to update Admin account's phone number -------", err)
-// 	}
-// 	require.NotEmpty(t, admin2)
+func TestUpdateStudentCourse(t *testing.T){
+	student1 := createRandomStudent(t)
+	arg := UpdateStudentCourseParams{
+		RollNumber: student1.RollNumber,
+		Course: util.RandomBranch(),
+	}
+	student2, err := testQueries.UpdateStudentCourse(context.Background(), arg)
+	if(err!=nil){
+		log.Fatal("Failed to update student account's course number -------", err)
+	}
+	require.NotEmpty(t, student2)
 
-// 	require.Equal(t, admin1.ID, admin2.ID)
-// 	require.Equal(t, admin1.Email, admin2.Email)
-// 	require.Equal(t, admin1.Password, admin2.Password)
-// 	require.Equal(t, admin1.UserName, admin2.UserName)
-// 	require.Equal(t, admin1.FirstName, admin2.FirstName)
-// 	require.Equal(t, admin1.LastName, admin2.LastName)
-// 	require.Equal(t, admin1.IDNumber, admin2.IDNumber)
-// 	require.Equal(t, arg.Phone, admin2.Phone)
-// 	require.WithinDuration(t, admin1.CreatedAt.Time, admin2.CreatedAt.Time, time.Second)
-// }
+	require.Equal(t, student1.ID, student2.ID)
+	require.Equal(t, student1.Email, student2.Email)
+	require.Equal(t, student1.Password, student2.Password)
+	require.Equal(t, student1.UserName, student2.UserName)
+	require.Equal(t, student1.FirstName, student2.FirstName)
+	require.Equal(t, student1.LastName, student2.LastName)
+	require.Equal(t, student1.RollNumber, student2.RollNumber)
+	require.Equal(t, student1.Stream, student2.Stream)
+	require.Equal(t, arg.Course, student2.Course)
+	require.Equal(t, student1.Phone, student2.Phone)
+	require.Equal(t, student1.Mentor, student2.Mentor)
+	require.WithinDuration(t, student1.CreatedAt.Time, student2.CreatedAt.Time, time.Second)
+}
 
 func TestDeleteStudent(t *testing.T){
 	student1 := createRandomStudent(t)

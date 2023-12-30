@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres
+        image: postgres:alpine
         env:
           POSTGRES_PASSWORD: password
           POSTGRES_DB: opconnect
@@ -21,6 +21,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - name: Set up Go 1.2X
         uses: actions/setup-go@v4
@@ -30,7 +32,11 @@ jobs:
       - name: Checkout code to the go repository
         uses: actions/checkout@v3
 
+      - name: Install golang-migrate
+        run: curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz ; sudo mv migrate.linux-amd64 /usr/bin/migrate ; which migrate
+
       - name: make migrations
         run: make migrateUp
+
       - name: Test
         run: make test

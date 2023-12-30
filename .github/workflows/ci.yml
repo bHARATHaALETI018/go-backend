@@ -1,0 +1,36 @@
+name: ci-test
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: opconnect
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Set up Go 1.2X
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Checkout code to the go repository
+        uses: actions/checkout@v3
+
+      - name: make migrations
+        run: make migrateUp
+      - name: Test
+        run: make test
